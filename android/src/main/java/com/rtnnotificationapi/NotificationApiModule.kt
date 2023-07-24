@@ -1,7 +1,7 @@
 package com.rtnnotificationapi
 
 import com.facebook.react.bridge.ReactApplicationContext
-import com.notificationapi.rn.NativeNotificationApiSpec
+import com.rtnnotificationapi.NativeNotificationApiSpec
 import com.notificationapi.notificationapi_android_sdk.NotificationApi
 import com.notificationapi.notificationapi_android_sdk.models.NotificationApiCredentials
 
