@@ -1,0 +1,30 @@
+{
+    "name": "notificationapi-react-native-sdk",
+    "version": "0.0.1",
+    "react-native": "js/index",
+    "source": "js/index",
+    "files": [
+      "js",
+      "android",
+      "ios",
+      "rtn-notificationapi.podspec",
+      "!android/build",
+      "!ios/build",
+      "!**/__tests__",
+      "!**/__fixtures__",
+      "!**/__mocks__"
+    ],
+    "devDependencies": {},
+    "peerDependencies": {
+      "react": "*",
+      "react-native": "*"
+    },
+    "codegenConfig": {
+      "name": "RTNNotificationApiSpec",
+      "type": "modules",
+      "jsSrcsDir": "js",
+      "android": {
+        "javaPackageName": "com.rtnnotificationapi"
+      }
+    }
+  }
