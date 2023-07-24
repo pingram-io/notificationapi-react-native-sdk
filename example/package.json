@@ -7,7 +7,9 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "pod-install": "cd ios && bundle install && RCT_NEW_ARCH_ENABLED=1 bundle exec pod install",
+    "codegen:android": "cd android && ./gradlew generateCodegenArtifactsFromSchema"
   },
   "dependencies": {
     "react": "18.2.0",
