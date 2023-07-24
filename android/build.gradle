@@ -24,8 +24,13 @@ android {
 repositories {
   mavenCentral()
   google()
+  maven {
+    url 'https://jitpack.io'
+  }
 }
 
 dependencies {
   implementation 'com.facebook.react:react-native'
+
+  api 'com.github.notificationapi-com:notificationapi-android-sdk:main-SNAPSHOT'
 }
