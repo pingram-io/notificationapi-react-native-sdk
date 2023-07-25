@@ -8,7 +8,7 @@ import com.notificationapi.notificationapi_android_sdk.models.NotificationApiCre
 class NotificationApiModule(reactContext: ReactApplicationContext) : NativeNotificationApiSpec(reactContext) {
 
   companion object {
-    const val NAME = "NotificationApiReactNativeSdk"
+    const val NAME = "RTNNotificationApi"
   }
 
   override fun getName() = NAME
