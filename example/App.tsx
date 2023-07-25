@@ -1,30 +1,22 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   Text,
   View,
-  NativeEventEmitter,
-  NativeModules
+  NativeEventEmitter
 } from 'react-native';
 
-import RTNNotificationApi from 'notificationapi-react-native-sdk/js/NativeNotificationApi'
+import RTNNotificationApi from 'notificationapi-react-native-sdk/js'
 import { Events } from 'notificationapi-react-native-sdk/js/NotificationApiEvents'
 
 function App(): JSX.Element {
   useEffect(() => {
-    RTNNotificationApi?.configure('clientId', 'userId')
+    RTNNotificationApi?.configure('clientId', 'userId', undefined)
 
-    console.log(JSON.stringify(NativeModules))
+    RTNNotificationApi?.requestNotificationPermission()
 
-    const eventEmitter = new NativeEventEmitter(NativeModules.RTNNotificationApi)
+    const eventEmitter = new NativeEventEmitter(undefined)
     let listener = eventEmitter.addListener(Events.NOTIFICATION_PERMISSIONS_REQUESTED, event => {
       console.log(event)
     })
