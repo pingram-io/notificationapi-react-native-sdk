@@ -20,4 +20,12 @@ class NotificationApiModule(reactContext: ReactApplicationContext) : NativeNotif
   override fun requestNotificationPermission() {
     NotificationApi.shared.askNotificationPermissions()
   }
+
+  override fun addListener(eventType: String) {
+
+  }
+
+  override fun removeListeners(count: Double) {
+
+  }
 }
