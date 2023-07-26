@@ -16,7 +16,7 @@ function App(): JSX.Element {
 
     RTNNotificationApi?.requestNotificationPermission()
 
-    const eventEmitter = new NativeEventEmitter(undefined)
+    const eventEmitter = new NativeEventEmitter(RTNNotificationApi)
     let listener = eventEmitter.addListener(Events.NOTIFICATION_PERMISSIONS_REQUESTED, event => {
       console.log(event)
     })
