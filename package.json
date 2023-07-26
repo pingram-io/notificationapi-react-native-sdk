@@ -1,6 +1,11 @@
 {
     "name": "notificationapi-react-native-sdk",
     "version": "0.0.1",
+    "description": "NotificationAPI for React Native",
+    "homepage": "https://github.com/notificationapi-com/notificationapi-react-native-sdk",
+    "license": "MIT",
+    "author": "devthedevel",
+    "repository": "https://github.com/notificationapi-com/notificationapi-react-native-sdk",
     "react-native": "js/index",
     "source": "js/index",
     "files": [
