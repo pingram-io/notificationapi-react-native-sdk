@@ -5,6 +5,9 @@ export interface Spec extends TurboModule {
   configure(clientId: string, userId: string, hashedUserId?: string): void;
 
   requestNotificationPermission(): void;
+
+  addListener: (eventType: string) => void;
+  removeListeners: (count: number) => void;
 }
 
 export default TurboModuleRegistry.get<Spec>(
