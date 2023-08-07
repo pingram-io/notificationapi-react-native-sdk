@@ -67,6 +67,7 @@ PODS:
     - hermes-engine/Pre-built (= 0.72.3)
   - hermes-engine/Pre-built (0.72.3)
   - libevent (2.1.12)
+  - NotificationApi_Ios_Sdk (1.0.0)
   - OpenSSL-Universal (1.1.1100)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -1060,6 +1061,7 @@ PODS:
     - React-perflogger (= 0.72.3)
   - rtn-notificationapi (0.0.1):
     - hermes-engine
+    - NotificationApi_Ios_Sdk
     - RCT-Folly (= 2021.07.22.00)
     - RCTRequired
     - RCTTypeSafety
@@ -1162,6 +1164,7 @@ SPEC REPOS:
     - FlipperKit
     - fmt
     - libevent
+    - NotificationApi_Ios_Sdk
     - OpenSSL-Universal
     - SocketRocket
     - YogaKit
@@ -1272,6 +1275,7 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: 10fbd3f62405c41ea07e71973ea61e1878d07322
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
+  NotificationApi_Ios_Sdk: a6414bd4c857208f62ea7278189f4989f94e8bce
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: a2faf4bad4e438ca37b2040cb8f7799baa065c18
@@ -1309,11 +1313,11 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 837c1bebd2f84572db17698cd702ceaf585b0d9a
   React-utils: bcb57da67eec2711f8b353f6e3d33bd8e4b2efa3
   ReactCommon: 3ccb8fb14e6b3277e38c73b0ff5e4a1b8db017a9
-  rtn-notificationapi: 736f4a086641ed921d6d5a75de908726050fe991
+  rtn-notificationapi: b49e988e94dc6bab73b97871cbc40231b32dca12
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 8796b55dba14d7004f980b54bcc9833ee45b28ce
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: f8b9b9b4dc1eebce5ad5e9a8e788e387832c1dae
+PODFILE CHECKSUM: 01cc6a357235da018bb5f6a893f3299fb73159b4
 
 COCOAPODS: 1.12.1
