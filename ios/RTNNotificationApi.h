@@ -1,8 +1,9 @@
 #import <RTNNotificationApiSpec/RTNNotificationApiSpec.h>
+#import <React/RCTEventEmitter.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RTNNotificationApi : NSObject <NativeNotificationApiSpec>
+@interface RTNNotificationApi : RCTEventEmitter <NativeNotificationApiSpec>
 
 @end
 
