@@ -6,7 +6,8 @@ on:
       - main
 
 jobs:
-  pull-request-pipeline:
+  pull_request_pipeline:
+    name: Pull Request Pipeline
     runs-on: ubuntu-latest
     
     steps:
