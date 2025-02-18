@@ -26,6 +26,9 @@
     "react": "*",
     "react-native": "*"
   },
+  "resolutions": {
+    "ws": "^7.5.10"
+  },
   "codegenConfig": {
     "name": "NotificationApiReactNativeSdkSpec",
     "type": "modules",
