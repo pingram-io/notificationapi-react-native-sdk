@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  pull-request-pipeline:
     runs-on: ubuntu-latest
     
     steps:
