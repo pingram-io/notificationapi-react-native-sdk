@@ -1,0 +1,23 @@
+name: Pull Request Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pull_request_pipeline:
+    name: Pull Request Pipeline
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Install Dependencies
+      run: npm install 
