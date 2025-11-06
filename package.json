@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "react": "18.2.0",
-    "react-native": "0.72.17"
+    "react-native": "0.82.1"
   },
   "peerDependencies": {
     "react": "*",
