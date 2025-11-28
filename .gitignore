@@ -3,4 +3,12 @@ node_modules
 .DS_Store
 **/local.properties
 android/.gradle
+android/build
+android/app/build
+ios/build
+ios/Pods
+ios/*.xcworkspace
+ios/*.xcuserdata
 .history
+dist
+*.log
