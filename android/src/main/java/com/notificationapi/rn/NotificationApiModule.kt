@@ -15,6 +15,21 @@ class NotificationApiModule(reactContext: ReactApplicationContext) : NativeNotif
 
   companion object {
     const val NAME = "NotificationApiReactNativeSdk"
+    private var reactContext: ReactApplicationContext? = null
+    
+    fun getReactContext(): ReactApplicationContext? = reactContext
+  }
+
+  init {
+    NotificationApiModule.reactContext = reactContext
+    // Also try to store in MainApplication if it exists (for FirebaseMessagingService access)
+    try {
+      val mainAppClass = Class.forName("com.millerm30.noti.MainApplication")
+      val setReactContextMethod = mainAppClass.getMethod("setReactContext", ReactApplicationContext::class.java)
+      setReactContextMethod.invoke(null, reactContext)
+    } catch (e: Exception) {
+      // MainApplication might not exist or might not have this method - that's okay
+    }
   }
 
   override fun getName() = NAME

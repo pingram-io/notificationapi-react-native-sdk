@@ -35,19 +35,34 @@ export class NotificationAPIService {
       ? `${this.clientId}:${this.userId}:${this.hashedUserId}`
       : `${this.clientId}:${this.userId}`;
     // Base64 encoding for React Native (btoa is not available)
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    // For Basic Auth, tokens are ASCII, so we can use charCodeAt directly
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     let result = '';
     let i = 0;
+    
     while (i < token.length) {
-      const a = token.charCodeAt(i++);
-      const b = i < token.length ? token.charCodeAt(i++) : 0;
-      const c = i < token.length ? token.charCodeAt(i++) : 0;
-      const bitmap = (a << 16) | (b << 8) | c;
+      const byte1 = token.charCodeAt(i++);
+      const byte2 = i < token.length ? token.charCodeAt(i++) : undefined;
+      const byte3 = i < token.length ? token.charCodeAt(i++) : undefined;
+      
+      const bitmap = (byte1 << 16) | ((byte2 ?? 0) << 8) | (byte3 ?? 0);
+      
       result += chars.charAt((bitmap >> 18) & 63);
       result += chars.charAt((bitmap >> 12) & 63);
-      result += i - 2 < token.length ? chars.charAt((bitmap >> 6) & 63) : '=';
-      result += i - 1 < token.length ? chars.charAt(bitmap & 63) : '=';
+      
+      if (byte2 !== undefined) {
+        result += chars.charAt((bitmap >> 6) & 63);
+      } else {
+        result += '=';
+      }
+      
+      if (byte3 !== undefined) {
+        result += chars.charAt(bitmap & 63);
+      } else {
+        result += '=';
+      }
     }
+    
     return result;
   }
 
