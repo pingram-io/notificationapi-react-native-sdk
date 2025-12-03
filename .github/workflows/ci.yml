@@ -46,21 +46,28 @@ jobs:
 
       - name: Send Slack notification for Success
         if: success()
-        uses: 8398a7/action-slack@v3
+        uses: slackapi/slack-github-action@v2.1.1
         with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,workflow,took
-          text: Published to NPM ${{ steps.publish.outputs.old-version }} -> ${{ steps.publish.outputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SUCCESS_WEBHOOK_URL }}
+          webhook: ${{ secrets.SLACK_SUCCESS_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "✅ CI Pipeline Success - Published to NPM: ${{ steps.publish.outputs.old-version }} → ${{ steps.publish.outputs.version }}"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "*✅ CI Pipeline Success*\n\n*Published to NPM:* `${{ steps.publish.outputs.old-version }}` → `${{ steps.publish.outputs.version }}`\n*Repository:* ${{ github.repository }}\n*Commit:* <${{ github.event.head_commit.url }}|${{ github.sha }}>\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow>"
 
       - name: Send Slack notification for Failure
         if: failure() || cancelled()
-        uses: 8398a7/action-slack@v3
+        uses: slackapi/slack-github-action@v2.1.1
         with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,workflow,took
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_FAILED_WEBHOOK_URL }}
+          webhook: ${{ secrets.SLACK_FAILED_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "❌ CI Pipeline Failed"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "*❌ CI Pipeline Failed*\n\n*Repository:* ${{ github.repository }}\n*Commit:* <${{ github.event.head_commit.url }}|${{ github.sha }}>\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow>"
