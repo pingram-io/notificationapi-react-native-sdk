@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import NativeNotificationApi from './NativeNotificationApi';
 import { NotificationAPIService } from './NotificationAPIService';
 import { getEventEmitter, Events, PushTokenReceivedEvent } from './events';

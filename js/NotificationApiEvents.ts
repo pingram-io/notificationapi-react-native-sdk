@@ -7,7 +7,9 @@ export interface NotificationPermissionsRequestedEvent {
   isGranted: boolean;
 }
 
-export interface NotificationOnClickEvent<T extends object = {}> {
+export interface NotificationOnClickEvent<
+  T extends Record<string, unknown> = Record<string, unknown>
+> {
   messageId: string;
   senderId: string;
   ttl: number;

@@ -30,6 +30,9 @@ jobs:
         if: steps.cache-modules.outputs.cache-hit != 'true'
         run: npm install
 
+      - name: Lint
+        run: npm run lint
+
       - name: Type Check
         run: npm run type-check
 
