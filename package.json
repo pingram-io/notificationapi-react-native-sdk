@@ -34,7 +34,6 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint js --ext .ts,.tsx",
     "type-check": "tsc --noEmit",
     "prettier": "prettier --config .prettierrc './js/**/*.ts' --write",
     "prettier-check": "prettier --config .prettierrc './js/**/*.ts' --check"
