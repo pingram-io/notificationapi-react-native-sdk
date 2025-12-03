@@ -28,7 +28,7 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache-modules.outputs.cache-hit != 'true'
-        run: npm install
+        run: npm ci --prefer-offline
 
       - name: Lint and format check
         run: |
