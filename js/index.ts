@@ -12,7 +12,7 @@ import type {
   Preference,
   Channel,
   DeliveryOption,
-  NotificationAPIException,
+  NotificationAPIException
 } from './models';
 
 // Export main SDK instance
@@ -30,7 +30,7 @@ export type {
   Preference,
   Channel,
   DeliveryOption,
-  SetupOptions,
+  SetupOptions
 };
 
 // Export classes
@@ -44,6 +44,5 @@ export type {
   NotificationPermissionsRequestedEvent,
   NotificationOnClickEvent,
   PushTokenReceivedEvent,
-  NotificationReceivedEvent,
+  NotificationReceivedEvent
 } from './events';
-

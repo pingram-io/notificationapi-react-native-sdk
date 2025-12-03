@@ -2,16 +2,29 @@
 export const API_ENDPOINTS = {
   us: 'https://api.notificationapi.com',
   eu: 'https://api.eu.notificationapi.com',
-  ca: 'https://api.ca.notificationapi.com',
+  ca: 'https://api.ca.notificationapi.com'
 } as const;
 
 export type Region = 'us' | 'eu' | 'ca';
 
 // Channel types
-export type Channel = 'EMAIL' | 'INAPP_WEB' | 'SMS' | 'CALL' | 'PUSH' | 'WEB_PUSH' | 'SLACK';
+export type Channel =
+  | 'EMAIL'
+  | 'INAPP_WEB'
+  | 'SMS'
+  | 'CALL'
+  | 'PUSH'
+  | 'WEB_PUSH'
+  | 'SLACK';
 
 // Delivery options
-export type DeliveryOption = 'off' | 'instant' | 'hourly' | 'daily' | 'weekly' | 'monthly';
+export type DeliveryOption =
+  | 'off'
+  | 'instant'
+  | 'hourly'
+  | 'daily'
+  | 'weekly'
+  | 'monthly';
 
 // Push token providers
 export type PushProvider = 'FCM' | 'APN';
@@ -134,4 +147,3 @@ export class NotificationAPIException extends Error {
     this.statusCode = statusCode;
   }
 }
-

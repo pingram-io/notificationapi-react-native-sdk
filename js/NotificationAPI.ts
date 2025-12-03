@@ -2,15 +2,8 @@ import { NativeModules, Platform } from 'react-native';
 import NativeNotificationApi from './NativeNotificationApi';
 import { NotificationAPIService } from './NotificationAPIService';
 import { getEventEmitter, Events, PushTokenReceivedEvent } from './events';
-import {
-  NotificationAPIException,
-} from './models';
-import type {
-  Region,
-  User,
-  PushToken,
-  Device,
-} from './models';
+import { NotificationAPIException } from './models';
+import type { Region, User, PushToken, Device } from './models';
 
 export interface SetupOptions {
   clientId: string;
@@ -49,7 +42,7 @@ class NotificationAPI {
       hashedUserId,
       region = 'us',
       autoRequestPermission = true,
-      baseUrl,
+      baseUrl
     } = options;
 
     this.clientId = clientId;
@@ -131,7 +124,7 @@ class NotificationAPI {
         platform: info.platform || Platform.OS,
         manufacturer: info.manufacturer || undefined,
         model: info.model || undefined,
-        app_id: info.appId || undefined,
+        app_id: info.appId || undefined
       };
     } catch (error) {
       console.error('Error getting device info:', error);
@@ -163,12 +156,12 @@ class NotificationAPI {
         device: deviceInfo,
         // iOS environment: 'sandbox' for development, 'production' for release
         // Default to production - users should configure this based on their build
-        environment: Platform.OS === 'ios' ? 'production' : undefined,
+        environment: Platform.OS === 'ios' ? 'production' : undefined
       };
 
       const user: User = {
         id: this.userId,
-        pushTokens: [pushToken],
+        pushTokens: [pushToken]
       };
 
       await this.service.identify(user);
@@ -177,7 +170,7 @@ class NotificationAPI {
       const eventEmitter = getEventEmitter();
       eventEmitter.emit(Events.PUSH_TOKEN_RECEIVED, {
         token,
-        type: pushToken.type,
+        type: pushToken.type
       } as PushTokenReceivedEvent);
     } catch (error) {
       console.error('Error syncing push token:', error);
@@ -203,4 +196,3 @@ class NotificationAPI {
 }
 
 export default NotificationAPI.getInstance();
-

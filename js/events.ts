@@ -4,14 +4,16 @@ export enum Events {
   NOTIFICATION_PERMISSIONS_REQUESTED = 'notificationapi_notification_permissions_requested',
   NOTIFICATION_ON_CLICK = 'notificationapi_notification_on_click',
   PUSH_TOKEN_RECEIVED = 'notificationapi_push_token_received',
-  NOTIFICATION_RECEIVED = 'notificationapi_notification_received',
+  NOTIFICATION_RECEIVED = 'notificationapi_notification_received'
 }
 
 export interface NotificationPermissionsRequestedEvent {
   isGranted: boolean;
 }
 
-export interface NotificationOnClickEvent<T extends Record<string, unknown> = Record<string, unknown>> {
+export interface NotificationOnClickEvent<
+  T extends Record<string, unknown> = Record<string, unknown>
+> {
   messageId: string;
   senderId: string;
   ttl: number;
@@ -43,4 +45,3 @@ export function getEventEmitter(): NativeEventEmitter {
   }
   return eventEmitter;
 }
-

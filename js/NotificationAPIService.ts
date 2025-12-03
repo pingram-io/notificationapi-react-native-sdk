@@ -8,7 +8,7 @@ import {
   Preference,
   Channel,
   DeliveryOption,
-  NotificationAPIException,
+  NotificationAPIException
 } from './models';
 
 export class NotificationAPIService {
@@ -36,33 +36,34 @@ export class NotificationAPIService {
       : `${this.clientId}:${this.userId}`;
     // Base64 encoding for React Native (btoa is not available)
     // For Basic Auth, tokens are ASCII, so we can use charCodeAt directly
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     let result = '';
     let i = 0;
-    
+
     while (i < token.length) {
       const byte1 = token.charCodeAt(i++);
       const byte2 = i < token.length ? token.charCodeAt(i++) : undefined;
       const byte3 = i < token.length ? token.charCodeAt(i++) : undefined;
-      
+
       const bitmap = (byte1 << 16) | ((byte2 ?? 0) << 8) | (byte3 ?? 0);
-      
+
       result += chars.charAt((bitmap >> 18) & 63);
       result += chars.charAt((bitmap >> 12) & 63);
-      
+
       if (byte2 !== undefined) {
         result += chars.charAt((bitmap >> 6) & 63);
       } else {
         result += '=';
       }
-      
+
       if (byte3 !== undefined) {
         result += chars.charAt(bitmap & 63);
       } else {
         result += '=';
       }
     }
-    
+
     return result;
   }
 
@@ -74,13 +75,13 @@ export class NotificationAPIService {
     const url = `${this.baseUrl}/${this.clientId}/users/${encodeURIComponent(this.userId)}/${resource}`;
 
     const headers: Record<string, string> = {
-      'Authorization': `Basic ${this.generateBasicToken()}`,
-      'Content-Type': 'application/json',
+      Authorization: `Basic ${this.generateBasicToken()}`,
+      'Content-Type': 'application/json'
     };
 
     const options: RequestInit = {
       method,
-      headers,
+      headers
     };
 
     if (data && (method === 'POST' || method === 'PATCH')) {
@@ -103,7 +104,10 @@ export class NotificationAPIService {
     }
   }
 
-  async getNotifications(before: string, count: number): Promise<{
+  async getNotifications(
+    before: string,
+    count: number
+  ): Promise<{
     notifications: InAppNotification[];
     hasMore: boolean;
     oldestReceived: string;
@@ -135,7 +139,13 @@ export class NotificationAPIService {
     await this.apiRequest('POST', '', user);
   }
 
-  async getUserAccountMetadata(): Promise<{ userAccountMetadata: { logo: string; environmentVapidPublicKey: string; hasWebPushEnabled: boolean } }> {
+  async getUserAccountMetadata(): Promise<{
+    userAccountMetadata: {
+      logo: string;
+      environmentVapidPublicKey: string;
+      hasWebPushEnabled: boolean;
+    };
+  }> {
     return this.apiRequest('GET', 'account_metadata');
   }
 
@@ -145,7 +155,9 @@ export class NotificationAPIService {
     oldestNeeded?: string;
   }): Promise<GetInAppNotificationsResult> {
     const maxCount = params.maxCount || 100;
-    const oldestNeeded = params.oldestNeeded || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const oldestNeeded =
+      params.oldestNeeded ||
+      new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const result: InAppNotification[] = [];
     let oldestReceived = params.before;
@@ -162,23 +174,22 @@ export class NotificationAPIService {
       );
 
       if (notificationsWithoutDuplicates.length > 0) {
-        oldestReceived = notificationsWithoutDuplicates.reduce((min, n) =>
-          min < n.date ? min : n.date
-        , oldestReceived);
+        oldestReceived = notificationsWithoutDuplicates.reduce(
+          (min, n) => (min < n.date ? min : n.date),
+          oldestReceived
+        );
       }
 
       result.push(...notificationsWithoutDuplicates);
       hasMore = notificationsWithoutDuplicates.length > 0;
       shouldLoadMore =
-        hasMore &&
-        result.length < maxCount &&
-        oldestReceived > oldestNeeded;
+        hasMore && result.length < maxCount && oldestReceived > oldestNeeded;
     }
 
     return {
       items: result,
       hasMore,
-      oldestReceived,
+      oldestReceived
     };
   }
 
@@ -194,7 +205,7 @@ export class NotificationAPIService {
       clicked?: string | null;
       opened?: string | null;
     } = {
-      trackingIds: params.ids,
+      trackingIds: params.ids
     };
 
     if (params.archived === true) {
@@ -228,7 +239,7 @@ export class NotificationAPIService {
       notificationId: params.notificationId,
       channel: params.channel,
       delivery: params.delivery,
-      subNotificationId: params.subNotificationId,
+      subNotificationId: params.subNotificationId
     };
     await this.postPreferences([preference]);
   }
@@ -242,4 +253,3 @@ export class NotificationAPIService {
     await this.postUser(user);
   }
 }
-

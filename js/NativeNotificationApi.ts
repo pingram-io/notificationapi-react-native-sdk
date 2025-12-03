@@ -1,5 +1,5 @@
-import type {TurboModule} from 'react-native/Libraries/TurboModule/RCTExport';
-import {TurboModuleRegistry} from 'react-native';
+import type { TurboModule } from 'react-native/Libraries/TurboModule/RCTExport';
+import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
   configure(clientId: string, userId: string, hashedUserId?: string): void;
@@ -15,5 +15,5 @@ export interface Spec extends TurboModule {
 }
 
 export default TurboModuleRegistry.get<Spec>(
-  'NotificationApiReactNativeSdk',
+  'NotificationApiReactNativeSdk'
 ) as Spec | null;
