@@ -11,6 +11,14 @@ A React Native SDK for integrating [NotificationAPI](https://notificationapi.com
 - **Device information**: Automatic device information collection
 - **Region support**: Support for US, EU, and CA regions
 
+## Requirements
+
+- **React Native**: >= 0.73.0
+- **React**: >= 18.0.0
+- **New Architecture**: Required (enabled by default in React Native 0.73+)
+
+> **Note**: This SDK uses TurboModule (React Native's New Architecture), which requires React Native 0.73.0 or higher. If you're using React Native 0.68-0.72, you'll need to enable the New Architecture manually.
+
 ## Installation
 
 ```bash
