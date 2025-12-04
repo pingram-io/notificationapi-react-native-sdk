@@ -147,7 +147,11 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
   }
   
   // Show notification even when app is in foreground
-  completionHandler(UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBadge);
+  if (@available(iOS 14.0, *)) {
+    completionHandler(UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBadge);
+  } else {
+    completionHandler(UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBadge);
+  }
 }
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
