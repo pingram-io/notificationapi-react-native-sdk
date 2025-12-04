@@ -9,6 +9,7 @@ jobs:
   pull_request_pipeline:
     name: Pull Request Pipeline
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
       - name: Checkout Code
