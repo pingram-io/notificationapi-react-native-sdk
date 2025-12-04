@@ -2,24 +2,18 @@
 
 A React Native SDK for integrating [NotificationAPI](https://notificationapi.com) push notifications into your mobile app.
 
-## Features
+## 🚀 Push Notification Support
 
-- **Cross-platform push notifications**: Full support for Android (FCM) and iOS (APN)
-- **One-call setup**: Simple `setup()` method handles initialization, user identification, and permission requests
-- **Automatic token syncing**: Push tokens are automatically synced with NotificationAPI backend
-- **Event handling**: Listen to notification received and opened events
-- **Device information**: Automatic device information collection
-- **Region support**: Support for US, EU, and CA regions
+**Cross-platform push notifications with native performance:**
 
-## Requirements
+- **Android**: Full FCM (Firebase Cloud Messaging) support
+- **iOS**: Direct APN (Apple Push Notifications) integration
 
-- **React Native**: >= 0.73.0
-- **React**: >= 18.0.0
-- **New Architecture**: Required (enabled by default in React Native 0.73+)
+This means you get native push notifications on both platforms with optimal performance.
 
-> **Note**: This SDK uses TurboModule (React Native's New Architecture), which requires React Native 0.73.0 or higher. If you're using React Native 0.68-0.72, you'll need to enable the New Architecture manually.
+## 🚀 Quick Start
 
-## Installation
+### 1. Installation
 
 ```bash
 npm install notificationapi-react-native-sdk
@@ -27,50 +21,252 @@ npm install notificationapi-react-native-sdk
 yarn add notificationapi-react-native-sdk
 ```
 
-### iOS Setup
+### 2. Setup (One Line!)
 
-1. **Install CocoaPods dependencies** (if using CocoaPods):
-   ```bash
-   cd ios && pod install && cd ..
-   ```
+```typescript
+import NotificationAPI from 'notificationapi-react-native-sdk';
 
-2. **Enable Push Notifications capability** in Xcode:
-   - Open your project in Xcode
-   - Select your target
-   - Go to "Signing & Capabilities"
-   - Click "+ Capability" and add "Push Notifications"
+// That's it! This handles initialization, user identification, and permission requests
+await NotificationAPI.setup({
+  clientId: 'your_client_id_here',
+  userId: 'user123',
+  autoRequestPermission: true, // automatically request push permissions
+  region: 'us', // 'us' (default), 'eu', or 'ca'
+});
+```
 
-3. **Configure APN**:
-   - You need an Apple Developer account
-   - Create an APN key in Apple Developer Console
-   - Configure your NotificationAPI account with the APN key
+### 3. Listen to Notifications (Optional)
 
-4. **Update AppDelegate** (if needed):
-   The SDK handles most of the setup, but you may need to ensure your `AppDelegate.m` or `AppDelegate.swift` properly handles APN token registration:
+```typescript
+import { getEventEmitter, Events } from 'notificationapi-react-native-sdk';
 
-   ```swift
-   // Swift
-   import UserNotifications
-   
-   func application(_ application: UIApplication, 
-                    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-     let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-     UserDefaults.standard.set(token, forKey: "apns_token")
-   }
-   ```
+const eventEmitter = getEventEmitter();
 
-   ```objc
-   // Objective-C
-   - (void)application:(UIApplication *)application 
-   didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-     NSString *token = [[deviceToken description] stringByTrimmingCharactersInSet:
-                        [NSCharacterSet characterSetWithCharactersInString:@"<>"]];
-     token = [token stringByReplacingOccurrencesOfString:@" " withString:@""];
-     [[NSUserDefaults standardUserDefaults] setObject:token forKey:@"apns_token"];
-   }
-   ```
+// Listen to notifications received while app is open
+eventEmitter.addListener(Events.NOTIFICATION_RECEIVED, (notification) => {
+  console.log('Received notification:', notification.title);
+});
 
-### Android Setup
+// Listen to notifications that opened the app
+eventEmitter.addListener(Events.NOTIFICATION_ON_CLICK, (notification) => {
+  console.log('App opened from notification:', notification.title);
+  // Handle deep linking or navigation
+});
+
+// Listen to push token updates
+eventEmitter.addListener(Events.PUSH_TOKEN_RECEIVED, (event) => {
+  console.log('Push token received:', event.token);
+});
+```
+
+### 4. Check Status
+
+```typescript
+// Check if SDK is ready
+if (NotificationAPI.isReady) {
+  console.log('NotificationAPI is ready!');
+}
+
+// Get the current user
+const userId = NotificationAPI.currentUser;
+
+// Get push token
+const token = await NotificationAPI.getPushToken();
+```
+
+## 📱 Complete Example
+
+```typescript
+import React, { useEffect } from 'react';
+import { View, Button, Alert } from 'react-native';
+import NotificationAPI, { getEventEmitter, Events } from 'notificationapi-react-native-sdk';
+
+function App() {
+  useEffect(() => {
+    // Setup NotificationAPI
+    NotificationAPI.setup({
+      clientId: 'your_client_id',
+      userId: 'user123',
+      autoRequestPermission: true,
+    }).catch((error) => {
+      console.error('Failed to setup NotificationAPI:', error);
+    });
+
+    // Listen for notifications
+    const eventEmitter = getEventEmitter();
+    
+    const receivedListener = eventEmitter.addListener(
+      Events.NOTIFICATION_RECEIVED,
+      (notification) => {
+        Alert.alert('New Notification', notification.title);
+      }
+    );
+
+    const clickListener = eventEmitter.addListener(
+      Events.NOTIFICATION_ON_CLICK,
+      (notification) => {
+        Alert.alert('Notification Clicked', notification.title);
+        // Handle navigation or deep linking
+      }
+    );
+
+    return () => {
+      receivedListener.remove();
+      clickListener.remove();
+    };
+  }, []);
+
+  const handleRequestPermission = async () => {
+    const granted = await NotificationAPI.requestPermission();
+    Alert.alert(
+      'Permission',
+      granted ? 'Permission granted' : 'Permission denied'
+    );
+  };
+
+  return (
+    <View>
+      <Button
+        title="Request Permission"
+        onPress={handleRequestPermission}
+      />
+    </View>
+  );
+}
+
+export default App;
+```
+
+## 🌙 Background Notifications (App Closed)
+
+Background notifications are automatically handled by the native modules. The SDK uses:
+
+- **FCM** for Android background notifications
+- **APN** for iOS background notifications
+
+No additional setup is required for basic background notification handling.
+
+### Handling Notification Taps
+
+When users tap a notification while the app is terminated, it's automatically handled:
+
+```typescript
+const eventEmitter = getEventEmitter();
+
+eventEmitter.addListener(Events.NOTIFICATION_ON_CLICK, (notification) => {
+  console.log('Notification tapped:', notification.title);
+  
+  // Handle deep linking or navigation
+  if (notification.data?.deepLink) {
+    // Navigate to specific screen
+    navigation.navigate(notification.data.deepLink);
+  }
+});
+```
+
+## 🔧 API Reference
+
+### NotificationAPI
+
+| Method | Description | Returns |
+|--------|-------------|---------|
+| `setup(options)` | One-call setup with initialization, identification, and optional permission request | `Promise<void>` |
+| `requestPermission()` | Request push notification permission | `Promise<boolean>` |
+| `getPushToken()` | Get the current push token (FCM on Android, APN on iOS) | `Promise<string \| null>` |
+| `getDeviceInfo()` | Get device information | `Promise<Device>` |
+| `getService()` | Get the API service instance for advanced usage | `NotificationAPIService` |
+
+### Setup Parameters
+
+```typescript
+await NotificationAPI.setup({
+  clientId: string,                  // Your NotificationAPI client ID (required)
+  userId: string,                    // User's unique identifier (required)
+  hashedUserId?: string,             // Hashed user ID for privacy (optional)
+  region?: string,                   // 'us' (default), 'eu', or 'ca'
+  autoRequestPermission?: boolean,  // Auto-request push permission (default: true)
+  baseUrl?: string,                  // Custom base URL (overrides region)
+});
+```
+
+### Properties
+
+- `NotificationAPI.isReady` (boolean): Check if SDK is initialized
+- `NotificationAPI.currentUser` (string | null): Get current user ID
+
+## Events
+
+### Events.NOTIFICATION_PERMISSIONS_REQUESTED
+
+Emitted when notification permission is requested.
+
+**Event data:**
+```typescript
+{
+  isGranted: boolean;
+}
+```
+
+### Events.NOTIFICATION_ON_CLICK
+
+Emitted when a notification is clicked/tapped.
+
+**Event data:**
+```typescript
+{
+  messageId: string;
+  senderId: string;
+  ttl: number;
+  title: string;
+  body: string;
+  data: Record<string, unknown>;
+}
+```
+
+### Events.PUSH_TOKEN_RECEIVED
+
+Emitted when a push token is received.
+
+**Event data:**
+```typescript
+{
+  token: string;
+  type: 'FCM' | 'APN';
+}
+```
+
+### Events.NOTIFICATION_RECEIVED
+
+Emitted when a notification is received (foreground).
+
+**Event data:**
+```typescript
+{
+  messageId: string;
+  senderId: string;
+  title: string;
+  body: string;
+  data?: Record<string, unknown>;
+}
+```
+
+## 🔒 Privacy & Security
+
+- User IDs can be hashed for additional privacy
+- All communication uses HTTPS
+- Push tokens are securely stored in NotificationAPI backend
+
+## 🛠️ Platform Setup
+
+### Requirements
+
+- **React Native**: >= 0.73.0
+- **React**: >= 18.0.0
+- **New Architecture**: Required (enabled by default in React Native 0.73+)
+
+> **Note**: This SDK uses TurboModule (React Native's New Architecture), which requires React Native 0.73.0 or higher. If you're using React Native 0.68-0.72, you'll need to enable the New Architecture manually.
+
+### Android (Firebase Required)
 
 The setup process is as follows:
 
@@ -358,236 +554,48 @@ await NotificationAPI.setup({
 
 This will automatically handle requesting push permissions and registering the device token with NotificationAPI.
 
-**Parameters:**
+### iOS (No Firebase Required!)
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `clientId`* | `string` | Your NotificationAPI account clientId. You can get it from [here](https://app.notificationapi.com/). |
-| `userId`* | `string` | The unique ID of the user in your application. |
-| `hashedUserId` | `string` | Hashed user ID for privacy (optional). |
-| `region` | `string` | Region code: `'us'` (default), `'eu'`, or `'ca'`. |
-| `autoRequestPermission` | `boolean` | Automatically request push notification permission (default: `true`). |
+1. **Install CocoaPods dependencies** (if using CocoaPods):
+   ```bash
+   cd ios && pod install && cd ..
+   ```
 
----
+2. **Enable Push Notifications capability** in Xcode:
+   - Open your project in Xcode
+   - Select your target
+   - Go to "Signing & Capabilities"
+   - Click "+ Capability" and add "Push Notifications"
 
-## Quick Start
+3. **Configure APN**:
+   - You need an Apple Developer account
+   - Create an APN key in Apple Developer Console
+   - Configure your NotificationAPI account with the APN key
 
-### 1. Setup (One Line!)
+4. **Update AppDelegate** (if needed):
+   The SDK handles most of the setup, but you may need to ensure your `AppDelegate.m` or `AppDelegate.swift` properly handles APN token registration:
 
-```typescript
-import NotificationAPI from 'notificationapi-react-native-sdk';
+   ```swift
+   // Swift
+   import UserNotifications
+   
+   func application(_ application: UIApplication, 
+                    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+     let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+     UserDefaults.standard.set(token, forKey: "apns_token")
+   }
+   ```
 
-// That's it! This handles initialization, user identification, and permission requests
-await NotificationAPI.setup({
-  clientId: 'your_client_id_here',
-  userId: 'user123',
-  autoRequestPermission: true, // automatically request push permissions
-  region: 'us', // 'us' (default), 'eu', or 'ca'
-});
-```
-
-### 2. Listen to Notifications (Optional)
-
-```typescript
-import { getEventEmitter, Events } from 'notificationapi-react-native-sdk';
-
-const eventEmitter = getEventEmitter();
-
-// Listen to notifications received while app is open
-eventEmitter.addListener(Events.NOTIFICATION_RECEIVED, (notification) => {
-  console.log('Received notification:', notification.title);
-});
-
-// Listen to notifications that opened the app
-eventEmitter.addListener(Events.NOTIFICATION_ON_CLICK, (notification) => {
-  console.log('App opened from notification:', notification.title);
-  // Handle deep linking or navigation
-});
-
-// Listen to push token updates
-eventEmitter.addListener(Events.PUSH_TOKEN_RECEIVED, (event) => {
-  console.log('Push token received:', event.token);
-});
-```
-
-### 3. Check Status
-
-```typescript
-// Check if SDK is ready
-if (NotificationAPI.isReady) {
-  console.log('NotificationAPI is ready!');
-}
-
-// Get the current user
-const userId = NotificationAPI.currentUser;
-
-// Get push token
-const token = await NotificationAPI.getPushToken();
-```
-
-## Complete Example
-
-```typescript
-import React, { useEffect } from 'react';
-import { View, Button, Alert } from 'react-native';
-import NotificationAPI, { getEventEmitter, Events } from 'notificationapi-react-native-sdk';
-
-function App() {
-  useEffect(() => {
-    // Setup NotificationAPI
-    NotificationAPI.setup({
-      clientId: 'your_client_id',
-      userId: 'user123',
-      autoRequestPermission: true,
-    }).catch((error) => {
-      console.error('Failed to setup NotificationAPI:', error);
-    });
-
-    // Listen for notifications
-    const eventEmitter = getEventEmitter();
-    
-    const receivedListener = eventEmitter.addListener(
-      Events.NOTIFICATION_RECEIVED,
-      (notification) => {
-        Alert.alert('New Notification', notification.title);
-      }
-    );
-
-    const clickListener = eventEmitter.addListener(
-      Events.NOTIFICATION_ON_CLICK,
-      (notification) => {
-        Alert.alert('Notification Clicked', notification.title);
-        // Handle navigation or deep linking
-      }
-    );
-
-    return () => {
-      receivedListener.remove();
-      clickListener.remove();
-    };
-  }, []);
-
-  const handleRequestPermission = async () => {
-    const granted = await NotificationAPI.requestPermission();
-    Alert.alert(
-      'Permission',
-      granted ? 'Permission granted' : 'Permission denied'
-    );
-  };
-
-  return (
-    <View>
-      <Button
-        title="Request Permission"
-        onPress={handleRequestPermission}
-      />
-    </View>
-  );
-}
-
-export default App;
-```
-
-## API Reference
-
-### NotificationAPI.setup(options)
-
-Initialize the SDK with user credentials.
-
-**Parameters:**
-- `clientId` (string, required): Your NotificationAPI client ID
-- `userId` (string, required): The user's unique identifier
-- `hashedUserId` (string, optional): Hashed user ID for privacy
-- `region` (string, optional): Region code - 'us' (default), 'eu', or 'ca'
-- `autoRequestPermission` (boolean, optional): Automatically request push permission (default: true)
-- `baseUrl` (string, optional): Custom base URL (overrides region)
-
-**Returns:** `Promise<void>`
-
-### NotificationAPI.requestPermission()
-
-Request push notification permission.
-
-**Returns:** `Promise<boolean>` - true if permission was granted
-
-### NotificationAPI.getPushToken()
-
-Get the current push token (FCM on Android, APN on iOS).
-
-**Returns:** `Promise<string | null>`
-
-### NotificationAPI.getDeviceInfo()
-
-Get device information.
-
-**Returns:** `Promise<Device>` - Device object with device_id, platform, manufacturer, model, etc.
-
-### NotificationAPI.getService()
-
-Get the API service instance for advanced usage (in-app notifications, preferences, etc.).
-
-**Returns:** `NotificationAPIService`
-
-### Properties
-
-- `NotificationAPI.isReady` (boolean): Check if SDK is initialized
-- `NotificationAPI.currentUser` (string | null): Get current user ID
-
-## Events
-
-### Events.NOTIFICATION_PERMISSIONS_REQUESTED
-
-Emitted when notification permission is requested.
-
-**Event data:**
-```typescript
-{
-  isGranted: boolean;
-}
-```
-
-### Events.NOTIFICATION_ON_CLICK
-
-Emitted when a notification is clicked/tapped.
-
-**Event data:**
-```typescript
-{
-  messageId: string;
-  senderId: string;
-  ttl: number;
-  title: string;
-  body: string;
-  data: Record<string, unknown>;
-}
-```
-
-### Events.PUSH_TOKEN_RECEIVED
-
-Emitted when a push token is received.
-
-**Event data:**
-```typescript
-{
-  token: string;
-  type: 'FCM' | 'APN';
-}
-```
-
-### Events.NOTIFICATION_RECEIVED
-
-Emitted when a notification is received (foreground).
-
-**Event data:**
-```typescript
-{
-  messageId: string;
-  senderId: string;
-  title: string;
-  body: string;
-  data?: Record<string, unknown>;
-}
-```
+   ```objc
+   // Objective-C
+   - (void)application:(UIApplication *)application 
+   didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+     NSString *token = [[deviceToken description] stringByTrimmingCharactersInSet:
+                        [NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+     token = [token stringByReplacingOccurrencesOfString:@" " withString:@""];
+     [[NSUserDefaults standardUserDefaults] setObject:token forKey:@"apns_token"];
+   }
+   ```
 
 ## Advanced Usage
 
@@ -620,54 +628,47 @@ await service.updateInAppNotifications({
 const preferences = await service.getPreferences();
 ```
 
-## Platform-Specific Notes
+## 🐛 Troubleshooting
 
-### Android
+### Common Issues
 
-- Requires Firebase Cloud Messaging (FCM) setup
-- Background notifications are handled automatically
-- Foreground notifications can be customized via event listeners
+1. **Notifications not received**
 
-### iOS
+   - **Android**: Verify Firebase setup is correct
+   - **iOS**: Ensure APN key is configured correctly
+   - Check if permission was granted: `await NotificationAPI.requestPermission()`
+   - Ensure your NotificationAPI client ID is correct
 
-- Uses native APN (Apple Push Notifications)
-- Requires Apple Developer Program membership
-- Push Notifications capability must be enabled in Xcode
-- APN keys must be configured in NotificationAPI dashboard
-- Environment (sandbox/production) is determined by your build configuration
+2. **Push tokens not syncing**
 
-## Troubleshooting
+   - **Android**: Verify Firebase is properly configured and `google-services.json` is in the correct location
+   - **iOS**: Ensure APN is properly configured and the app has push notification capabilities enabled
+   - Check that `NotificationAPI.setup()` completed successfully
 
-### Push tokens not syncing
+3. **ClassNotFoundException for FirebaseMessagingService**
 
-- **Android**: Verify Firebase is properly configured and `google-services.json` is in the correct location
-- **iOS**: Ensure APN is properly configured and the app has push notification capabilities enabled
-- Check that `NotificationAPI.setup()` completed successfully
+   - Ensure the service file is in your app's package directory
+   - Verify the package name in the service file matches your app's package
+   - Check that the service is registered in `AndroidManifest.xml` with the correct package path
+   - Clean and rebuild: `cd android && ./gradlew clean && cd .. && npx react-native run-android`
 
-### Notifications not received
+4. **Permission denied**
 
-- Verify permission was granted: `await NotificationAPI.requestPermission()`
-- Check that your NotificationAPI client ID is correct
-- Ensure push tokens are being synced (check `getPushToken()`)
-- **Android**: 
-  - Verify Firebase project includes your app's package name
-  - Ensure `FirebaseMessagingService` is created in your app's package (Step 4)
-  - Check that the service is registered in `AndroidManifest.xml`
-  - Check logs: `adb logcat | grep NotificationAPI`
-- **iOS**: Ensure APN keys are correctly configured
+   - **Android**: Check app notification settings in device settings
+   - **iOS**: Check notification settings in iOS Settings app
+   - Try calling `requestPermission()` again
 
-### ClassNotFoundException for FirebaseMessagingService
+5. **Android Specific Issues**
+   - Verify `google-services.json` is in the correct location
+   - Check that Firebase project includes your Android app's package name
+   - Ensure `FirebaseMessagingService` is created in your app's package (Step 4)
+   - Check that the service is registered in `AndroidManifest.xml`
+   - Check logs: `adb logcat | grep NotificationAPI`
 
-- Ensure the service file is in your app's package directory
-- Verify the package name in the service file matches your app's package
-- Check that the service is registered in `AndroidManifest.xml` with the correct package path
-- Clean and rebuild: `cd android && ./gradlew clean && cd .. && npx react-native run-android`
-
-### Permission denied
-
-- **Android**: Check app notification settings in device settings
-- **iOS**: Check notification settings in iOS Settings app
-- Try calling `requestPermission()` again
+6. **iOS Specific Issues**
+   - Ensure you have an Apple Developer Program membership
+   - Push Notifications capability must be enabled in Xcode
+   - APNs keys must be properly configured on your server
 
 ## Testing Locally
 
@@ -682,13 +683,11 @@ npm link
 npm link notificationapi-react-native-sdk
 ```
 
-## Support
+## 📞 Support
 
-- [Documentation](https://docs.notificationapi.com)
-- [GitHub Issues](https://github.com/notificationapi-com/notificationapi-react-native-sdk/issues)
+- [Documentation](https://notificationapi.com/docs)
 - [Email Support](mailto:support@notificationapi.com)
 
-## License
+## 📄 License
 
-MIT
-
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
