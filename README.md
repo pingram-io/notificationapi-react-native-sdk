@@ -597,37 +597,6 @@ This will automatically handle requesting push permissions and registering the d
    }
    ```
 
-## Advanced Usage
-
-### In-App Notifications
-
-The SDK also supports in-app notifications (similar to the React Client SDK):
-
-```typescript
-const service = NotificationAPI.getService();
-
-// Get in-app notifications
-const result = await service.getInAppNotifications({
-  before: new Date().toISOString(),
-  maxCount: 100,
-});
-
-// Mark as opened
-await service.updateInAppNotifications({
-  ids: ['notification-id'],
-  opened: true,
-});
-
-// Mark as clicked
-await service.updateInAppNotifications({
-  ids: ['notification-id'],
-  clicked: true,
-});
-
-// Get preferences
-const preferences = await service.getPreferences();
-```
-
 ## 🐛 Troubleshooting
 
 ### Common Issues
