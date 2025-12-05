@@ -647,16 +647,33 @@ This will automatically handle requesting push permissions and registering the d
 
 ## Testing Locally
 
-See [TESTING.md](./TESTING.md) for a comprehensive guide on testing the SDK locally in a React Native app.
+To test the SDK locally during development, use `npm link`:
 
-Quick start:
+**Step 1: Link the SDK package**
 ```bash
 # In SDK directory
+cd notificationapi-react-native-sdk
 npm link
-
-# In your test app
-npm link notificationapi-react-native-sdk
 ```
+
+**Step 2: Link in your test app**
+```bash
+# In your test React Native app
+npm link notificationapi-react-native-sdk
+npm install
+```
+
+**Step 3: Rebuild your app**
+```bash
+# iOS
+cd ios && pod install && cd ..
+npx react-native run-ios
+
+# Android
+npx react-native run-android
+```
+
+The SDK will now use your local development version. Make changes in the SDK directory and rebuild your test app to see updates.
 
 ## 📞 Support
 
