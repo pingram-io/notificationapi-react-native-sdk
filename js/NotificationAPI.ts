@@ -148,15 +148,13 @@ class NotificationAPI {
 
       const deviceInfo = await this.getDeviceInfo();
       // Determine environment for iOS (sandbox vs production)
-      // In React Native, we can't easily detect this, so we'll default to production
-      // Users can override if needed
+      // Use 'sandbox' for debug builds, 'production' for release builds
       const pushToken: PushToken = {
         type: Platform.OS === 'ios' ? 'APN' : 'FCM',
         token,
         device: deviceInfo,
         // iOS environment: 'sandbox' for development, 'production' for release
-        // Default to production - users should configure this based on their build
-        environment: Platform.OS === 'ios' ? 'production' : undefined
+        environment: Platform.OS === 'ios' ? (__DEV__ ? 'sandbox' : 'production') : undefined
       };
 
       const user: User = {
