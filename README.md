@@ -570,6 +570,12 @@ This will automatically handle requesting push permissions and registering the d
 3. **Configure APN**:
    - You need an Apple Developer account
    - Create an APN key in Apple Developer Console
+   - **Important**: When uploading the APN key to NotificationAPI, ensure it includes the PEM headers:
+     ```
+     -----BEGIN PRIVATE KEY-----
+     [your key content here]
+     -----END PRIVATE KEY-----
+     ```
    - Configure your NotificationAPI account with the APN key
 
 4. **Update AppDelegate** (if needed):
@@ -581,7 +587,7 @@ This will automatically handle requesting push permissions and registering the d
    
    func application(_ application: UIApplication, 
                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-     let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+     let token = deviceToken.map { String(format: "%02x", $0) }.joined()
      UserDefaults.standard.set(token, forKey: "apns_token")
    }
    ```
