@@ -154,7 +154,12 @@ class NotificationAPI {
         token,
         device: deviceInfo,
         // iOS environment: 'sandbox' for development, 'production' for release
-        environment: Platform.OS === 'ios' ? (__DEV__ ? 'sandbox' : 'production') : undefined
+        environment:
+          Platform.OS === 'ios'
+            ? __DEV__
+              ? 'sandbox'
+              : 'production'
+            : undefined
       };
 
       const user: User = {
