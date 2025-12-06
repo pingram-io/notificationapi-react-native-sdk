@@ -16,15 +16,15 @@ This means you get native push notifications on both platforms with optimal perf
 ### 1. Installation
 
 ```bash
-npm install notificationapi-react-native-sdk
+npm install @notificationapi/react-native
 # or
-yarn add notificationapi-react-native-sdk
+yarn add @notificationapi/react-native
 ```
 
 ### 2. Setup (One Line!)
 
 ```typescript
-import NotificationAPI from 'notificationapi-react-native-sdk';
+import NotificationAPI from '@notificationapi/react-native';
 
 // That's it! This handles initialization, user identification, and permission requests
 await NotificationAPI.setup({
@@ -38,7 +38,7 @@ await NotificationAPI.setup({
 ### 3. Listen to Notifications (Optional)
 
 ```typescript
-import { getEventEmitter, Events } from 'notificationapi-react-native-sdk';
+import { getEventEmitter, Events } from '@notificationapi/react-native';
 
 const eventEmitter = getEventEmitter();
 
@@ -79,7 +79,7 @@ const token = await NotificationAPI.getPushToken();
 ```typescript
 import React, { useEffect } from 'react';
 import { View, Button, Alert } from 'react-native';
-import NotificationAPI, { getEventEmitter, Events } from 'notificationapi-react-native-sdk';
+import NotificationAPI, { getEventEmitter, Events } from '@notificationapi/react-native';
 
 function App() {
   useEffect(() => {
@@ -533,15 +533,15 @@ Our React Native SDK makes it easy to register the device for push notifications
 **Install the SDK:**
 
 ```bash
-npm install notificationapi-react-native-sdk
+npm install @notificationapi/react-native
 # or
-yarn add notificationapi-react-native-sdk
+yarn add @notificationapi/react-native
 ```
 
 **Then, initialize the SDK in your app** (e.g., in `App.tsx` or your main component):
 
 ```typescript
-import NotificationAPI from 'notificationapi-react-native-sdk';
+import NotificationAPI from '@notificationapi/react-native';
 
 // Initialize when your app starts
 await NotificationAPI.setup({
@@ -659,7 +659,7 @@ npm link
 **Step 2: Link in your test app**
 ```bash
 # In your test React Native app
-npm link notificationapi-react-native-sdk
+npm link @notificationapi/react-native
 npm install
 ```
 
