@@ -2,6 +2,7 @@ name: Pull Request Pipeline
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
 
@@ -9,14 +10,33 @@ jobs:
   pull_request_pipeline:
     name: Pull Request Pipeline
     runs-on: ubuntu-latest
-    
+    if: github.event.pull_request.draft == false
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-    
-    - name: Install Dependencies
-      run: npm install 
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cache node_modules
+        id: cache-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: 20.x-${{ runner.OS }}-build-${{ hashFiles('package.json') }}
+
+      - name: Install Dependencies
+        if: steps.cache-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline
+
+      - name: Lint and format check
+        run: |
+          npm run lint &
+          npm run prettier-check &
+          wait
+
+      - name: Type Check
+        run: npm run type-check
