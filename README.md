@@ -31,7 +31,7 @@ await NotificationAPI.setup({
   clientId: 'your_client_id_here',
   userId: 'user123',
   autoRequestPermission: true, // automatically request push permissions
-  region: 'us', // 'us' (default), 'eu', or 'ca'
+  region: 'us' // 'us' (default), 'eu', or 'ca'
 });
 ```
 
@@ -94,7 +94,7 @@ function App() {
 
     // Listen for notifications
     const eventEmitter = getEventEmitter();
-    
+
     const receivedListener = eventEmitter.addListener(
       Events.NOTIFICATION_RECEIVED,
       (notification) => {
@@ -155,7 +155,7 @@ const eventEmitter = getEventEmitter();
 
 eventEmitter.addListener(Events.NOTIFICATION_ON_CLICK, (notification) => {
   console.log('Notification tapped:', notification.title);
-  
+
   // Handle deep linking or navigation
   if (notification.data?.deepLink) {
     // Navigate to specific screen
@@ -168,13 +168,13 @@ eventEmitter.addListener(Events.NOTIFICATION_ON_CLICK, (notification) => {
 
 ### NotificationAPI
 
-| Method | Description | Returns |
-|--------|-------------|---------|
-| `setup(options)` | One-call setup with initialization, identification, and optional permission request | `Promise<void>` |
-| `requestPermission()` | Request push notification permission | `Promise<boolean>` |
-| `getPushToken()` | Get the current push token (FCM on Android, APN on iOS) | `Promise<string \| null>` |
-| `getDeviceInfo()` | Get device information | `Promise<Device>` |
-| `getService()` | Get the API service instance for advanced usage | `NotificationAPIService` |
+| Method                | Description                                                                         | Returns                   |
+| --------------------- | ----------------------------------------------------------------------------------- | ------------------------- |
+| `setup(options)`      | One-call setup with initialization, identification, and optional permission request | `Promise<void>`           |
+| `requestPermission()` | Request push notification permission                                                | `Promise<boolean>`        |
+| `getPushToken()`      | Get the current push token (FCM on Android, APN on iOS)                             | `Promise<string \| null>` |
+| `getDeviceInfo()`     | Get device information                                                              | `Promise<Device>`         |
+| `getService()`        | Get the API service instance for advanced usage                                     | `NotificationAPIService`  |
 
 ### Setup Parameters
 
@@ -201,6 +201,7 @@ await NotificationAPI.setup({
 Emitted when notification permission is requested.
 
 **Event data:**
+
 ```typescript
 {
   isGranted: boolean;
@@ -212,6 +213,7 @@ Emitted when notification permission is requested.
 Emitted when a notification is clicked/tapped.
 
 **Event data:**
+
 ```typescript
 {
   messageId: string;
@@ -228,6 +230,7 @@ Emitted when a notification is clicked/tapped.
 Emitted when a push token is received.
 
 **Event data:**
+
 ```typescript
 {
   token: string;
@@ -240,6 +243,7 @@ Emitted when a push token is received.
 Emitted when a notification is received (foreground).
 
 **Event data:**
+
 ```typescript
 {
   messageId: string;
@@ -357,13 +361,13 @@ Add the required permissions and register the FirebaseMessagingService:
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-  
+
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-  
+
   <application ...>
     <!-- Your existing activities -->
-    
+
     <!-- Register FirebaseMessagingService -->
     <service
       android:name=".NotificationApiFirebaseMessagingService"
@@ -413,25 +417,25 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
-    
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        
+
         // Show the notification
         showNotification(remoteMessage)
-        
+
         // Emit event to React Native
         sendNotificationReceivedEvent(remoteMessage)
     }
-    
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         // Token refresh is handled by the SDK's sync mechanism
     }
-    
+
     private fun showNotification(remoteMessage: RemoteMessage) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        
+
         // Create notification channel for Android 8.0+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -445,11 +449,11 @@ class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
             }
             notificationManager.createNotificationChannel(channel)
         }
-        
+
         // Extract title and body
         val title = remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "Notification"
         val body = remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: ""
-        
+
         // Create intent for when notification is clicked
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -457,12 +461,12 @@ class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
                 putExtra(key, value)
             }
         }
-        
+
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        
+
         // Get app icon
         val iconResId = try {
             val appInfo = packageManager.getApplicationInfo(packageName, 0)
@@ -470,7 +474,7 @@ class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
         } catch (e: Exception) {
             android.R.drawable.ic_dialog_info
         }
-        
+
         // Build and show notification
         val notificationBuilder = NotificationCompat.Builder(this, "notificationapi_channel")
             .setSmallIcon(iconResId)
@@ -481,32 +485,32 @@ class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
-        
+
         val notificationId = remoteMessage.messageId?.hashCode() ?: System.currentTimeMillis().toInt()
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
-    
+
     private fun sendNotificationReceivedEvent(remoteMessage: RemoteMessage) {
         try {
             // Get React context from SDK module
             val moduleClass = Class.forName("com.notificationapi.rn.NotificationApiModule")
             val getReactContextMethod = moduleClass.getMethod("getReactContext")
             val reactContext = getReactContextMethod.invoke(null) as? com.facebook.react.bridge.ReactApplicationContext
-            
+
             reactContext?.let { context ->
                 val params = Arguments.createMap().apply {
                     putString("messageId", remoteMessage.messageId)
                     putString("senderId", remoteMessage.from)
                     putString("title", remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "")
                     putString("body", remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: "")
-                    
+
                     val dataMap = Arguments.createMap()
                     remoteMessage.data.forEach { (key, value) ->
                         dataMap.putString(key, value)
                     }
                     putMap("data", dataMap)
                 }
-                
+
                 context
                     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
                     ?.emit("notificationapi_notification_received", params)
@@ -518,7 +522,8 @@ class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
 }
 ```
 
-**Important**: 
+**Important**:
+
 - Replace `com.yourapp.package` with your actual app package name (found in `android/app/build.gradle` as `applicationId`)
 - Replace `MainActivity` with your main activity class name if different
 
@@ -548,7 +553,7 @@ await NotificationAPI.setup({
   clientId: 'YOUR_CLIENT_ID', // from NotificationAPI dashboard
   userId: 'user123', // your app's user ID
   autoRequestPermission: true, // automatically request push permissions
-  region: 'us', // 'us' (default), 'eu', or 'ca'
+  region: 'us' // 'us' (default), 'eu', or 'ca'
 });
 ```
 
@@ -557,6 +562,7 @@ This will automatically handle requesting push permissions and registering the d
 ### iOS (No Firebase Required!)
 
 1. **Install CocoaPods dependencies** (if using CocoaPods):
+
    ```bash
    cd ios && pod install && cd ..
    ```
@@ -584,8 +590,8 @@ This will automatically handle requesting push permissions and registering the d
    ```swift
    // Swift
    import UserNotifications
-   
-   func application(_ application: UIApplication, 
+
+   func application(_ application: UIApplication,
                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
      let token = deviceToken.map { String(format: "%02x", $0) }.joined()
      UserDefaults.standard.set(token, forKey: "apns_token")
@@ -594,7 +600,7 @@ This will automatically handle requesting push permissions and registering the d
 
    ```objc
    // Objective-C
-   - (void)application:(UIApplication *)application 
+   - (void)application:(UIApplication *)application
    didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
      NSString *token = [[deviceToken description] stringByTrimmingCharactersInSet:
                         [NSCharacterSet characterSetWithCharactersInString:@"<>"]];
@@ -602,78 +608,6 @@ This will automatically handle requesting push permissions and registering the d
      [[NSUserDefaults standardUserDefaults] setObject:token forKey:@"apns_token"];
    }
    ```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Notifications not received**
-
-   - **Android**: Verify Firebase setup is correct
-   - **iOS**: Ensure APN key is configured correctly
-   - Check if permission was granted: `await NotificationAPI.requestPermission()`
-   - Ensure your NotificationAPI client ID is correct
-
-2. **Push tokens not syncing**
-
-   - **Android**: Verify Firebase is properly configured and `google-services.json` is in the correct location
-   - **iOS**: Ensure APN is properly configured and the app has push notification capabilities enabled
-   - Check that `NotificationAPI.setup()` completed successfully
-
-3. **ClassNotFoundException for FirebaseMessagingService**
-
-   - Ensure the service file is in your app's package directory
-   - Verify the package name in the service file matches your app's package
-   - Check that the service is registered in `AndroidManifest.xml` with the correct package path
-   - Clean and rebuild: `cd android && ./gradlew clean && cd .. && npx react-native run-android`
-
-4. **Permission denied**
-
-   - **Android**: Check app notification settings in device settings
-   - **iOS**: Check notification settings in iOS Settings app
-   - Try calling `requestPermission()` again
-
-5. **Android Specific Issues**
-   - Verify `google-services.json` is in the correct location
-   - Check that Firebase project includes your Android app's package name
-   - Ensure `FirebaseMessagingService` is created in your app's package (Step 4)
-   - Check that the service is registered in `AndroidManifest.xml`
-   - Check logs: `adb logcat | grep NotificationAPI`
-
-6. **iOS Specific Issues**
-   - Ensure you have an Apple Developer Program membership
-   - Push Notifications capability must be enabled in Xcode
-   - APNs keys must be properly configured on your server
-
-## Testing Locally
-
-To test the SDK locally during development, use `npm link`:
-
-**Step 1: Link the SDK package**
-```bash
-# In SDK directory
-cd notificationapi-react-native-sdk
-npm link
-```
-
-**Step 2: Link in your test app**
-```bash
-# In your test React Native app
-npm link @notificationapi/react-native
-npm install
-```
-
-**Step 3: Rebuild your app**
-```bash
-# iOS
-cd ios && pod install && cd ..
-npx react-native run-ios
-
-# Android
-npx react-native run-android
-```
-
-The SDK will now use your local development version. Make changes in the SDK directory and rebuild your test app to see updates.
 
 ## 📞 Support
 
