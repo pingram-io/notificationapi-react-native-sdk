@@ -46,6 +46,8 @@ jobs:
       - name: Publish
         id: publish
         uses: JS-DevTools/npm-publish@v4
+        with:
+          provenance: true
 
       - name: Send Slack notification for Success
         if: success()
