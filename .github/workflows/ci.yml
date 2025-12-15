@@ -43,9 +43,14 @@ jobs:
       - name: Type Check
         run: npm run type-check
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Publish
         id: publish
         uses: JS-DevTools/npm-publish@v4
+        with:
+          provenance: true
 
       - name: Send Slack notification for Success
         if: success()
