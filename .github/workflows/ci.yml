@@ -9,6 +9,9 @@ jobs:
   pipeline:
     name: Lint, Type Check & Publish
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -17,6 +20,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@notificationapi"
 
       - name: Cache node_modules
         id: cache-modules
@@ -41,8 +46,6 @@ jobs:
       - name: Publish
         id: publish
         uses: JS-DevTools/npm-publish@v4
-        with:
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Send Slack notification for Success
         if: success()
