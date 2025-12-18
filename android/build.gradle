@@ -32,6 +32,6 @@ repositories {
 dependencies {
   implementation 'com.facebook.react:react-native'
   api 'com.github.notificationapi-com:notificationapi-android-sdk:381fc28'
-  implementation platform('com.google.firebase:firebase-bom:32.0.0')
-  implementation 'com.google.firebase:firebase-messaging'
+  api platform('com.google.firebase:firebase-bom:32.0.0')
+  api 'com.google.firebase:firebase-messaging'
 }

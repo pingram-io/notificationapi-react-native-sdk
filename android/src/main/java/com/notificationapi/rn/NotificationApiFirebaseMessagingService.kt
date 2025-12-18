@@ -12,7 +12,6 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.notificationapi.notificationapi_android_sdk.NotificationApi
 
 class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
     
@@ -25,13 +24,6 @@ class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
         android.util.Log.d("NotificationAPI", "Data: ${remoteMessage.data}")
         android.util.Log.d("NotificationAPI", "Notification: ${remoteMessage.notification?.title} - ${remoteMessage.notification?.body}")
         
-        // Let the Android SDK handle the message (for tracking, etc.)
-        try {
-            NotificationApi.shared.onMessageReceived(remoteMessage)
-        } catch (e: Exception) {
-            android.util.Log.e("NotificationAPI", "Error in NotificationApi.shared.onMessageReceived", e)
-        }
-        
         // Show the notification
         showNotification(remoteMessage)
         
@@ -41,8 +33,8 @@ class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
     
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // Token refresh is handled by the SDK's sync mechanism
-        NotificationApi.shared.onNewToken(token)
+        android.util.Log.d("NotificationAPI", "New FCM token received: $token")
+        // Token refresh is handled by the SDK's sync mechanism via the React Native layer
     }
     
     private fun showNotification(remoteMessage: RemoteMessage) {

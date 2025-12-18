@@ -274,24 +274,27 @@ Emitted when a notification is received (foreground).
 
 The setup process is as follows:
 
-1. [Set up a Firebase Project](#1-set-up-a-firebase-project)
+1. [Set up Firebase](#1-set-up-firebase)
 2. [Connect NotificationAPI to FCM](#2-connect-notificationapi-to-fcm)
-3. [Configure your React Native project for Firebase](#3-configure-your-react-native-project-for-firebase)
-4. [Add FirebaseMessagingService](#4-add-firebasemessagingservice)
-5. [Install and initialize the NotificationAPI React Native SDK](#5-install-and-initialize-the-notificationapi-react-native-sdk)
+3. [Install and initialize the NotificationAPI React Native SDK](#3-install-and-initialize-the-notificationapi-react-native-sdk)
 
 ---
 
-#### 1. Set up a Firebase Project
+#### 1. Set up Firebase
 
-If you don't have one already, you'll need to create a Firebase project.
+If you haven't already set up Firebase for your React Native Android app, follow Google's official documentation:
 
-1. Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
-2. Within your new project, navigate to **Project Settings** > **General**.
-3. Click the Android icon to add an Android app to your project. Use your React Native app's package name (e.g., `com.example.myapp`).
-   - Find your package name in `android/app/build.gradle` under `applicationId`
-4. Follow the on-screen instructions to register the app, and download the `google-services.json` file.
-5. Place the downloaded `google-services.json` file into the `android/app/` directory of your React Native project.
+- [Add Firebase to your Android project](https://firebase.google.com/docs/android/setup)
+
+This will guide you through:
+- Creating a Firebase project (if needed)
+- Adding your Android app to the project
+- Downloading and placing the `google-services.json` file in `android/app/`
+- Adding the Google Services plugin to your `build.gradle` files
+
+> **Note:** Firebase dependencies (`firebase-messaging`) are automatically included when you install the NotificationAPI React Native SDK. You don't need to manually add Firebase dependencies to your `build.gradle` files.
+
+> **Note:** Permissions (`INTERNET` and `POST_NOTIFICATIONS`) and the `FirebaseMessagingService` registration are automatically handled by the SDK via Android's manifest merger. You don't need to manually add these to your `AndroidManifest.xml`.
 
 ---
 
@@ -299,7 +302,7 @@ If you don't have one already, you'll need to create a Firebase project.
 
 To allow NotificationAPI to send notifications on your behalf, you need to provide it with your Firebase project's credentials.
 
-1. In the Firebase Console, go to **Project Settings** > **Service Accounts**.
+1. In the [Firebase Console](https://console.firebase.google.com/), go to **Project Settings** > **Service Accounts**.
 2. Click **Generate new private key**. A JSON file containing your service account key will be downloaded.
 
 <details>
@@ -309,229 +312,14 @@ Treat this file like a password. Never commit it to version control or expose it
 
 </details>
 
-3. Go to your [NotificationAPI Dashboard](https://app.notificationapi.com/) and navigate to the **Integrations** page.
-4. Find the **Firebase Cloud Messaging (FCM)** integration and click **Configure**.
-5. Upload the service account JSON file you downloaded from Firebase.
+3. Go to your [NotificationAPI Dashboard](https://app.notificationapi.com/) and navigate to **Settings** > **Push**.
+4. Find the **Android (FCM)** form and copy the contents of the JSON file (including the `{}`) into the field and save.
 
 Your NotificationAPI account is now connected to your Firebase project.
 
 ---
 
-#### 3. Configure your React Native project for Firebase
-
-Next, you need to add the Google Services plugin to your React Native project's Android configuration.
-
-**In `android/build.gradle`:**
-
-Add the google-services plugin to the `buildscript` dependencies.
-
-```gradle
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        // ...
-        classpath 'com.google.gms:google-services:4.4.2'
-    }
-}
-```
-
-**In `android/app/build.gradle`:**
-
-Apply the `com.google.gms.google-services` plugin at the top of the file.
-
-```gradle
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
-
-// ...
-
-dependencies {
-    // ...
-    implementation platform('com.google.firebase:firebase-bom:33.0.0')
-    implementation 'com.google.firebase:firebase-messaging'
-}
-```
-
-**In `android/app/src/main/AndroidManifest.xml`:**
-
-Add the required permissions and register the FirebaseMessagingService:
-
-```xml
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-  <application ...>
-    <!-- Your existing activities -->
-
-    <!-- Register FirebaseMessagingService -->
-    <service
-      android:name=".NotificationApiFirebaseMessagingService"
-      android:exported="false">
-      <intent-filter>
-        <action android:name="com.google.firebase.MESSAGING_EVENT" />
-      </intent-filter>
-    </service>
-  </application>
-</manifest>
-```
-
-**Note**: Replace `.NotificationApiFirebaseMessagingService` with your actual package path (e.g., `com.example.myapp.NotificationApiFirebaseMessagingService`)
-
-Now, build your app to ensure the Firebase configuration is correct:
-
-```bash
-npx react-native run-android
-```
-
----
-
-#### 4. Add FirebaseMessagingService
-
-Due to Android's class loading requirements, you need to create a `FirebaseMessagingService` in your app's package. This is a one-time setup.
-
-Create a new file: `android/app/src/main/java/com/yourapp/package/NotificationApiFirebaseMessagingService.kt`
-
-**Replace `com.yourapp.package` with your app's actual package name** (same as your `applicationId` in `build.gradle`).
-
-Copy and paste this code:
-
-```kotlin
-package com.yourapp.package  // Replace with your app's package name
-
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.media.RingtoneManager
-import android.os.Build
-import androidx.core.app.NotificationCompat
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.google.firebase.messaging.FirebaseMessagingService
-import com.google.firebase.messaging.RemoteMessage
-
-class NotificationApiFirebaseMessagingService : FirebaseMessagingService() {
-
-    override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        super.onMessageReceived(remoteMessage)
-
-        // Show the notification
-        showNotification(remoteMessage)
-
-        // Emit event to React Native
-        sendNotificationReceivedEvent(remoteMessage)
-    }
-
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        // Token refresh is handled by the SDK's sync mechanism
-    }
-
-    private fun showNotification(remoteMessage: RemoteMessage) {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Create notification channel for Android 8.0+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                "notificationapi_channel",
-                "NotificationAPI",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "NotificationAPI push notifications"
-                enableVibration(true)
-                enableLights(true)
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        // Extract title and body
-        val title = remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "Notification"
-        val body = remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: ""
-
-        // Create intent for when notification is clicked
-        val intent = Intent(this, MainActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            remoteMessage.data.forEach { (key, value) ->
-                putExtra(key, value)
-            }
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        // Get app icon
-        val iconResId = try {
-            val appInfo = packageManager.getApplicationInfo(packageName, 0)
-            appInfo.icon
-        } catch (e: Exception) {
-            android.R.drawable.ic_dialog_info
-        }
-
-        // Build and show notification
-        val notificationBuilder = NotificationCompat.Builder(this, "notificationapi_channel")
-            .setSmallIcon(iconResId)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setAutoCancel(true)
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-            .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
-
-        val notificationId = remoteMessage.messageId?.hashCode() ?: System.currentTimeMillis().toInt()
-        notificationManager.notify(notificationId, notificationBuilder.build())
-    }
-
-    private fun sendNotificationReceivedEvent(remoteMessage: RemoteMessage) {
-        try {
-            // Get React context from SDK module
-            val moduleClass = Class.forName("com.notificationapi.rn.NotificationApiModule")
-            val getReactContextMethod = moduleClass.getMethod("getReactContext")
-            val reactContext = getReactContextMethod.invoke(null) as? com.facebook.react.bridge.ReactApplicationContext
-
-            reactContext?.let { context ->
-                val params = Arguments.createMap().apply {
-                    putString("messageId", remoteMessage.messageId)
-                    putString("senderId", remoteMessage.from)
-                    putString("title", remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "")
-                    putString("body", remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: "")
-
-                    val dataMap = Arguments.createMap()
-                    remoteMessage.data.forEach { (key, value) ->
-                        dataMap.putString(key, value)
-                    }
-                    putMap("data", dataMap)
-                }
-
-                context
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-                    ?.emit("notificationapi_notification_received", params)
-            }
-        } catch (e: Exception) {
-            // React context not available yet
-        }
-    }
-}
-```
-
-**Important**:
-
-- Replace `com.yourapp.package` with your actual app package name (found in `android/app/build.gradle` as `applicationId`)
-- Replace `MainActivity` with your main activity class name if different
-
-That's it! The service will automatically handle incoming notifications and display them.
-
----
-
-#### 5. Install and initialize the NotificationAPI React Native SDK
+#### 3. Install and initialize the NotificationAPI React Native SDK
 
 Our React Native SDK makes it easy to register the device for push notifications.
 
