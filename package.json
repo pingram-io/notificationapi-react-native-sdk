@@ -1,6 +1,6 @@
 {
   "name": "@notificationapi/react-native",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "React Native SDK for NotificationAPI - Push notifications for Android and iOS",
   "main": "js/index.ts",
   "types": "js/index.ts",
