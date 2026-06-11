@@ -8,7 +8,7 @@
   "source": "js/index",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/notificationapi-com/notificationapi-react-native-sdk.git"
+    "url": "git+https://github.com/pingram-io/notificationapi-react-native-sdk.git"
   },
   "keywords": [
     "react-native",
